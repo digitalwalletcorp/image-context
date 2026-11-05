@@ -206,7 +206,7 @@ export default [
       // block-spacing disallow or enforce spaces inside of blocks after opening block and before closing block
       '@stylistic/block-spacing': ['error', 'always'],
       // brace-style enforce consistent brace style for blocks
-      '@stylistic/brace-style': 'off',
+      '@stylistic/brace-style': ['error', '1tbs', { 'allowSingleLine': false }],
       // camelcase enforce camelcase naming convention
       camelcase: 'off',
       // capitalized-comments enforce or disallow capitalization of the first letter of a comment

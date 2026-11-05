@@ -7,7 +7,7 @@ Easily convert, resize, rotate, and process images in the browser. Supports Data
 #### ✨ Features
 
 * **Flexible Input & Output**: Convert seamlessly between DataURL, Base64, `Blob`, `File`, `ArrayBuffer`, and `HTMLImageElement`.
-* **Automatic Format Detection**: PNG, JPEG, GIF, WebP, and BMP are identified directly from the binary signature.
+* **Automatic Format Detection**: PNG, JPEG, GIF, WebP, BMP, and AVIF are identified directly from the binary signature.
 * **Resize to Byte Limit**: `resize(maxSize)` shrinks image dimensions step by step to fit under a specific file size (in bytes) while preserving aspect ratio.
 * **Rotate, Flip & Convert**: Rotate by 90-degree increments, flip horizontally/vertically, or change format easily.
 * **Zero Dependencies**: Lightweight and fully browser-compatible.

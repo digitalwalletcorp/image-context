@@ -173,12 +173,14 @@ describe('@/image-context.ts', () => {
       expect((await ImageContext.from(svg, { mimeType: 'image/x-custom' })).getMimeType()).toBe('image/x-custom');
       expect((await ImageContext.from(await svg.arrayBuffer())).getMimeType()).toBe('application/octet-stream');
     });
-    it('GIF / WebP / BMP を署名から判定すること', async () => {
+    it('GIF / WebP / BMP / AVIF を署名から判定すること', async () => {
       const ascii = (text: string): number[] => [...text].map((c) => c.charCodeAt(0));
       const cases: [number[], string][] = [
         [ascii('GIF89a'), 'image/gif'],
         [[...ascii('RIFF'), 0, 0, 0, 0, ...ascii('WEBP')], 'image/webp'],
-        [ascii('BM'), 'image/bmp']
+        [ascii('BM'), 'image/bmp'],
+        [[0, 0, 0, 24, ...ascii('ftypavif'), 0, 0, 0, 0, ...ascii('avifmif1')], 'image/avif'],
+        [[0, 0, 0, 24, ...ascii('ftypmif1'), 0, 0, 0, 0, ...ascii('mif1avif')], 'image/avif']
       ];
       for (const [bytes, mimeType] of cases) {
         expect((await ImageContext.from(new Uint8Array(bytes).buffer)).getMimeType()).toBe(mimeType);
@@ -241,6 +243,7 @@ describe('@/image-context.ts', () => {
         ['image/gif', 'gif'],
         ['image/webp', 'webp'],
         ['image/bmp', 'bmp'],
+        ['image/avif', 'avif'],
         ['image/svg+xml', 'svg'],
         ['application/octet-stream', 'png']
       ];
