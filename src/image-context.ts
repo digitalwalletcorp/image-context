@@ -317,6 +317,7 @@ const extensionOf = (mimeType: string): string => {
     case 'gif':
     case 'webp':
     case 'bmp':
+    case 'avif':
       return type;
     case 'jpeg':
       return 'jpg';
@@ -359,11 +360,31 @@ const readImage = async (image: ImageSource, mimeType?: string): Promise<[ArrayB
   return [await blob.arrayBuffer(), blob.type];
 };
 
+/** ftyp ボックスのブランドのうち、AVIF を表すもの */
+const AVIF_BRANDS = ['avif', 'avis'];
+
+/**
+ * ISOBMFF の ftyp ボックスに並ぶブランドを返す
+ * 8バイト目からメジャーブランド、16バイト目から互換ブランドが4文字ずつ並ぶ
+ *
+ * @param {Uint8Array} bytes
+ * @returns {string[]}
+ */
+const readBrands = (bytes: Uint8Array): string[] => {
+  const end = Math.min(new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getUint32(0), bytes.length);
+  const text = new TextDecoder('latin1').decode(bytes.subarray(0, end));
+  const brands = [text.slice(8, 12)];
+  for (let i = 16; i + 4 <= end; i += 4) {
+    brands.push(text.slice(i, i + 4));
+  }
+  return brands;
+};
+
 /**
  * 先頭の署名から画像の形式を判定する
  *
  * @param {ArrayBuffer} buffer
- * @returns {string | undefined} PNG / JPEG / GIF / WebP / BMP のいずれでもない場合は undefined
+ * @returns {string | undefined} PNG / JPEG / GIF / WebP / BMP / AVIF のいずれでもない場合は undefined
  */
 const detectImageType = (buffer: ArrayBuffer): string | undefined => {
   const bytes = new Uint8Array(buffer);
@@ -384,6 +405,9 @@ const detectImageType = (buffer: ArrayBuffer): string | undefined => {
   }
   if (matches([0x42, 0x4d])) {
     return 'image/bmp';
+  }
+  if (matches([0x66, 0x74, 0x79, 0x70], 4) && readBrands(bytes).some((brand) => AVIF_BRANDS.includes(brand))) {
+    return 'image/avif';
   }
   return undefined;
 };
